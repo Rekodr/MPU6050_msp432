@@ -58,5 +58,6 @@ int mpu_setup(hal_s* param);
 static void msp432_reset(void);
 void run_self_test(void);
 static void setup_gyro(void);
+void read_from_mpl(void);
 
 #endif /* MSP432PERIPHERALS_MPU_SETUP_H_ */

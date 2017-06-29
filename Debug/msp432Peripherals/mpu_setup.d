@@ -84,6 +84,7 @@ msp432Peripherals/mpu_setup.obj: D:/EGR424workspace/MPU6050_msp432/mpl/mag_distu
 msp432Peripherals/mpu_setup.obj: D:/EGR424workspace/MPU6050_msp432/mpl/motion_no_motion.h
 msp432Peripherals/mpu_setup.obj: D:/EGR424workspace/MPU6050_msp432/mpl/no_gyro_fusion.h
 msp432Peripherals/mpu_setup.obj: D:/EGR424workspace/MPU6050_msp432/mpl/quaternion_supervisor.h
+msp432Peripherals/mpu_setup.obj: D:/EGR424workspace/MPU6050_msp432/eMPL-hal/eMPL_outputs.h
 msp432Peripherals/mpu_setup.obj: D:/EGR424workspace/MPU6050_msp432/drivers/include/mpu.h
 msp432Peripherals/mpu_setup.obj: ../msp432Peripherals/packet.h
 
@@ -171,5 +172,6 @@ D:/EGR424workspace/MPU6050_msp432/mpl/mag_disturb.h:
 D:/EGR424workspace/MPU6050_msp432/mpl/motion_no_motion.h: 
 D:/EGR424workspace/MPU6050_msp432/mpl/no_gyro_fusion.h: 
 D:/EGR424workspace/MPU6050_msp432/mpl/quaternion_supervisor.h: 
+D:/EGR424workspace/MPU6050_msp432/eMPL-hal/eMPL_outputs.h: 
 D:/EGR424workspace/MPU6050_msp432/drivers/include/mpu.h: 
 ../msp432Peripherals/packet.h: 

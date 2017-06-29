@@ -15,7 +15,7 @@
 #include "inv_mpu_dmp_motion_driver.h"
 #include "invensense.h"
 #include "invensense_adv.h"
-//#include "eMPL_outputs.h"
+#include "eMPL_outputs.h"
 #include "mltypes.h"
 #include "mpu.h"
 #include "log.h"
@@ -55,6 +55,105 @@ static struct platform_data_s gyro_pdata = {
 };
 
 
+
+
+
+void read_from_mpl(void)
+{
+    MAP_SysTick_disableModule();
+    MAP_Interrupt_disableInterrupt(INT_PORT4);
+
+    long msg, data[9];
+    int8_t accuracy;
+    unsigned long timestamp;
+    float float_data[3] = {0};
+
+    if (inv_get_sensor_type_quat(data, &accuracy, (inv_time_t*)&timestamp)) {
+       /* Sends a quaternion packet to the PC. Since this is used by the Python
+        * test app to visually represent a 3D quaternion, it's sent each time
+        * the MPL has new data.
+        */
+        eMPL_send_quat(data);
+
+        /* Specific data packets can be sent or suppressed using USB commands. */
+        if (hal->report & PRINT_QUAT)
+            eMPL_send_data(PACKET_DATA_QUAT, data);
+    }
+
+    if (hal->report & PRINT_ACCEL) {
+        if (inv_get_sensor_type_accel(data, &accuracy,
+            (inv_time_t*)&timestamp))
+            eMPL_send_data(PACKET_DATA_ACCEL, data);
+    }
+    if (hal->report & PRINT_GYRO) {
+        if (inv_get_sensor_type_gyro(data, &accuracy,
+            (inv_time_t*)&timestamp))
+            eMPL_send_data(PACKET_DATA_GYRO, data);
+    }
+#ifdef COMPASS_ENABLED
+    if (hal.report & PRINT_COMPASS) {
+        if (inv_get_sensor_type_compass(data, &accuracy,
+            (inv_time_t*)&timestamp))
+            eMPL_send_data(PACKET_DATA_COMPASS, data);
+    }
+#endif
+    if (hal->report & PRINT_EULER) {
+        if (inv_get_sensor_type_euler(data, &accuracy,
+            (inv_time_t*)&timestamp))
+            eMPL_send_data(PACKET_DATA_EULER, data);
+    }
+    if (hal->report & PRINT_ROT_MAT) {
+        if (inv_get_sensor_type_rot_mat(data, &accuracy,
+            (inv_time_t*)&timestamp))
+            eMPL_send_data(PACKET_DATA_ROT, data);
+    }
+    if (hal->report & PRINT_HEADING) {
+        if (inv_get_sensor_type_heading(data, &accuracy,
+            (inv_time_t*)&timestamp))
+            eMPL_send_data(PACKET_DATA_HEADING, data);
+    }
+    if (hal->report & PRINT_LINEAR_ACCEL) {
+        if (inv_get_sensor_type_linear_acceleration(float_data, &accuracy, (inv_time_t*)&timestamp)) {
+            MPL_LOGI("Linear Accel: %7.5f %7.5f %7.5f\r\n",
+                    float_data[0], float_data[1], float_data[2]);
+         }
+    }
+    if (hal->report & PRINT_GRAVITY_VECTOR) {
+            if (inv_get_sensor_type_gravity(float_data, &accuracy,
+                (inv_time_t*)&timestamp))
+                MPL_LOGI("Gravity Vector: %7.5f %7.5f %7.5f\r\n",
+                        float_data[0], float_data[1], float_data[2]);
+    }
+    if (hal->report & PRINT_PEDO) {
+        unsigned long timestamp;
+        get_timestamp(&timestamp);
+        if (timestamp > hal->next_pedo_ms) {
+            hal->next_pedo_ms = timestamp + PEDO_READ_MS;
+            unsigned long step_count, walk_time;
+            dmp_get_pedometer_step_count(&step_count);
+            dmp_get_pedometer_walk_time(&walk_time);
+            MPL_LOGI("Walked %ld steps over %ld milliseconds..\n", step_count,
+            walk_time);
+        }
+    }
+
+    /* Whenever the MPL detects a change in motion state, the application can
+     * be notified. For this example, we use an LED to represent the current
+     * motion state.
+     */
+    msg = inv_get_message_level_0(INV_MSG_MOTION_EVENT |
+            INV_MSG_NO_MOTION_EVENT);
+    if (msg) {
+        if (msg & INV_MSG_MOTION_EVENT) {
+            MPL_LOGI("Motion!\n\r");
+        } else if (msg & INV_MSG_NO_MOTION_EVENT) {
+            MPL_LOGI("No motion!\n\r");
+        }
+    }
+
+    setup_timer();
+    MAP_Interrupt_enableInterrupt(INT_PORT4);
+}
 
 
 /* Handle sensor on/off combinations. */
@@ -271,7 +370,7 @@ int mpu_setup(hal_s* param)
      */
 
     /* Allows use of the MPL APIs in read_from_mpl. */
-    //inv_enable_eMPL_outputs();
+    inv_enable_eMPL_outputs();
 
     result = inv_start_mpl();
     if (result == INV_ERROR_NOT_AUTHORIZED)
@@ -290,7 +389,6 @@ int mpu_setup(hal_s* param)
 
     /* Get/set hardware configuration. Start gyro. */
     /* Wake up all sensors. */
-
     mpu_set_sensors(INV_XYZ_GYRO | INV_XYZ_ACCEL);
     /* Push both gyro and accel data into the FIFO. */
     mpu_configure_fifo(INV_XYZ_GYRO | INV_XYZ_ACCEL);
@@ -309,21 +407,9 @@ int mpu_setup(hal_s* param)
     /* Set chip-to-body orientation matrix.
      * Set hardware units to dps/g's/degrees scaling factor.
      */
-    inv_set_gyro_orientation_and_scale(
-            inv_orientation_matrix_to_scalar(gyro_pdata.orientation),
-            (long) gyro_fsr << 15);
-    inv_set_accel_orientation_and_scale(
-            inv_orientation_matrix_to_scalar(gyro_pdata.orientation),
-            (long) accel_fsr << 15);
+    inv_set_gyro_orientation_and_scale(inv_orientation_matrix_to_scalar(gyro_pdata.orientation),(long) gyro_fsr << 15);
+    inv_set_accel_orientation_and_scale(inv_orientation_matrix_to_scalar(gyro_pdata.orientation),(long) accel_fsr << 15);
 
-    /* Initialize HAL state variables. */
-    hal->sensors = ACCEL_ON | GYRO_ON;
-    hal->dmp_on = 0;
-    hal->report = 0;
-    hal->rx.cmd = 0;
-    hal->next_pedo_ms = 0;
-    hal->next_compass_ms = 0;
-    hal->next_temp_ms = 0;
 
     /* Compass reads are handled by scheduler. */
     get_timestamp(&timestamp);
@@ -358,39 +444,39 @@ int mpu_setup(hal_s* param)
      * DMP_FEATURE_SEND_CAL_GYRO: Add calibrated gyro data to the FIFO. Cannot
      * be used in combination with DMP_FEATURE_SEND_RAW_GYRO.
      */
-    if (dmp_load_motion_driver_firmware())
-    {
-        MPL_LOGE("Could not download DMP.\n");
-        msp432_reset();
-    }
-    dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_pdata.orientation));
-    dmp_register_tap_cb(tap_cb);
-    dmp_register_android_orient_cb(android_orient_cb);
-    /*
-     * Known Bug -
-     * DMP when enabled will sample sensor data at 200Hz and output to FIFO at the rate
-     * specified in the dmp_set_fifo_rate API. The DMP will then sent an interrupt once
-     * a sample has been put into the FIFO. Therefore if the dmp_set_fifo_rate is at 25Hz
-     * there will be a 25Hz interrupt from the MPU device.
-     *
-     * There is a known issue in which if you do not enable DMP_FEATURE_TAP
-     * then the interrupts will be at 200Hz even if fifo rate
-     * is set at a different rate. To avoid this issue include the DMP_FEATURE_TAP
-     *
-     * DMP sensor fusion works only with gyro at +-2000dps and accel +-2G
-     */
-    hal->dmp_features = DMP_FEATURE_6X_LP_QUAT
-                        | DMP_FEATURE_TAP
-                        | DMP_FEATURE_ANDROID_ORIENT
-                        | DMP_FEATURE_SEND_RAW_ACCEL
-                        | DMP_FEATURE_SEND_CAL_GYRO
-                        | DMP_FEATURE_GYRO_CAL;
 
-    dmp_enable_feature(hal->dmp_features);
-    dmp_set_fifo_rate(DEFAULT_MPU_HZ);
-    inv_set_quat_sample_rate(1000000L / DEFAULT_MPU_HZ);
-    mpu_set_dmp_state(1);
-    hal->dmp_on = 1; // turn on the dmp
+    if (hal->dmp_on)
+    {
+        if (dmp_load_motion_driver_firmware())
+        {
+            MPL_LOGE("Could not download DMP.\n");
+            msp432_reset();
+        }
+
+        MPL_LOGE("DMP driver firmware loaded.\n");
+        dmp_set_orientation(inv_orientation_matrix_to_scalar(gyro_pdata.orientation));
+        dmp_register_tap_cb(tap_cb);
+        dmp_register_android_orient_cb(android_orient_cb);
+        /*
+         * Known Bug -
+         * DMP when enabled will sample sensor data at 200Hz and output to FIFO at the rate
+         * specified in the dmp_set_fifo_rate API. The DMP will then sent an interrupt once
+         * a sample has been put into the FIFO. Therefore if the dmp_set_fifo_rate is at 25Hz
+         * there will be a 25Hz interrupt from the MPU device.
+         *
+         * There is a known issue in which if you do not enable DMP_FEATURE_TAP
+         * then the interrupts will be at 200Hz even if fifo rate
+         * is set at a different rate. To avoid this issue include the DMP_FEATURE_TAP
+         *
+         * DMP sensor fusion works only with gyro at +-2000dps and accel +-2G
+         */
+        dmp_enable_feature(hal->dmp_features);
+        dmp_set_fifo_rate(DEFAULT_MPU_HZ);
+        inv_set_quat_sample_rate(1000000L / DEFAULT_MPU_HZ);
+
+        /*turn on the dmp*/
+        mpu_set_dmp_state(1);
+    }
 
     return 0;
 }
