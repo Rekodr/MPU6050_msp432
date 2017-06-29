@@ -19,19 +19,12 @@
 
 #include "mpu_Uart.h"
 
-static volatile uint32_t aclk, mclk, smclk, hsmclk, bclk;
-
-static void interrupTest(void)
-{
-    P2->OUT ^= BIT2;
-}
+static volatile uint32_t mclk;
 
 int main(void){
     MAP_WDT_A_holdTimer();
     MAP_PCM_setPowerMode(PCM_LDO_MODE);
     MAP_PCM_setCoreVoltageLevel(PCM_VCORE1);
-    //MAP_CS_initClockSignal(CS_SMCLK, CS_MODOSC_SELECT, CS_CLOCK_DIVIDER_8);
-    //MAP_CS_initClockSignal(CS_ACLK, CS_MODOSC_SELECT, CS_CLOCK_DIVIDER_1);  Might need a second clock
     mclk = CS_getMCLK();
 
     P2->DIR |= BIT2;
@@ -50,7 +43,6 @@ int main(void){
         delay_ms(1000);
         P2->OUT ^= BIT2;
         run_self_test();
-       // MAP_PCM_gotoLPM0();
     }
 }
 
