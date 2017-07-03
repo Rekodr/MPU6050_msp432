@@ -60,30 +60,18 @@ int main(void){
         hal.next_temp_ms = 0;
 
     /*activate feature to activate*/
-    hal.dmp_features = DMP_FEATURE_6X_LP_QUAT
-                           // | DMP_FEATURE_TAP
-                           // | DMP_FEATURE_ANDROID_ORIENT
-                            | DMP_FEATURE_SEND_RAW_ACCEL
-                            | DMP_FEATURE_SEND_CAL_GYRO
-                            | DMP_FEATURE_GYRO_CAL;
+    hal.dmp_features =  DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_GYRO_CAL;
+                        //DMP_FEATURE_6X_LP_QUAT
+                        //DMP_FEATURE_TAP
+                        //DMP_FEATURE_SEND_RAW_ACCEL
+                        //DMP_FEATURE_SEND_CAL_GYRO
 
     mpu_setup(&hal);
-
-    hal.report = PRINT_GYRO;
-//
-//    while(1){
-//        delay_ms(1000);
-//        run_self_test();
-//    }
     while(1){
         unsigned long sensor_timestamp;
         int new_data = 0;
-        //if (rx_new)
-            /* A byte has been received via USB. See handle_input for a list of
-             * valid commands.
-             */
-           // handle_input();
-            get_timestamp(&timestamp);
+
+        get_timestamp(&timestamp);
 
         /* Temperature data doesn't need to be read with every gyro sample.
          * Let's make them timer-based like the compass reads.
@@ -95,12 +83,7 @@ int main(void){
 
         if (hal.motion_int_mode) {
             /* Enable motion interrupt. */
-            mpu_lp_motion_interrupt(500, 1, 5);
-            /* Notify the MPL that contiguity was broken. */
-            //inv_accel_was_turned_off();
-            //inv_gyro_was_turned_off();
-            //inv_compass_was_turned_off();
-            //inv_quaternion_sensor_was_turned_off();
+            mpu_lp_motion_interrupt(500, 3000, 5);
             /* Wait for the MPU interrupt. */
             while (!hal.new_gyro);
               MAP_PCM_gotoLPM0InterruptSafe();
@@ -111,9 +94,6 @@ int main(void){
 
         if (!hal.sensors || !hal.new_gyro) {
             MAP_PCM_gotoLPM0InterruptSafe();
-            /* Put the MSP430 to sleep until a timer interrupt or data ready
-             * interrupt is detected.
-             */
            continue;
         }
 
@@ -126,48 +106,28 @@ int main(void){
                 hal.new_gyro = 0;
             if (sensors & INV_XYZ_GYRO) {
                 /* Push the new data to the MPL. */
-
                 inv_build_gyro(gyro, sensor_timestamp);
-
-               printf("gyro: %7.4f %7.4f %7.4f\n\r",
-                           gyro[0]/65536.f,
-                           gyro[1]/65536.f,
-                           gyro[2]/65536.f);
-
-
                 new_data = 1;
-//                if (new_temp) {
-//                    new_temp = 0;
-//                    /* Temperature only used for gyro temp comp. */
-//                    mpu_get_temperature(&temperature, &sensor_timestamp);
-//                    inv_build_temp(temperature, sensor_timestamp);
-//                }
             }
             if (sensors & INV_XYZ_ACCEL) {
-//                accel[0] = (long)accel_short[0];
-//                accel[1] = (long)accel_short[1];
-//                accel[2] = (long)accel_short[2];
-//                inv_build_accel(accel, 0, sensor_timestamp);
-//                new_data = 1;
+                new_data = 1;
             }
             if (sensors & INV_WXYZ_QUAT) {
-                //inv_build_quat(quat, 0, sensor_timestamp);
                 new_data = 1;
             }
         }
 
-//        if (new_data) {
-//            if(inv_execute_on_data()) {
-//                MPL_LOGE("ERROR execute on data\n");
-//            }
-//
-//            /* This function reads bias-compensated sensor data and sensor
-//             * fusion outputs from the MPL. The outputs are formatted as seen
-//             * in eMPL_outputs.c. This function only needs to be called at the
-//             * rate requested by the host.
-//             */
-//            read_from_mpl();
-//        }
+        if (new_data) {
+            if(inv_execute_on_data()) {
+                MPL_LOGE("ERROR execute on data\n");
+            }
+            /* This function reads bias-compensated sensor data and sensor
+             * fusion outputs from the MPL. The outputs are formatted as seen
+             * in eMPL_outputs.c. This function only needs to be called at the
+             * rate requested by the host.
+             */
+            read_from_mpl();
+        }
     }
 
 }

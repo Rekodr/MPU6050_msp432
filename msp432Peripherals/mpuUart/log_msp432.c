@@ -95,7 +95,7 @@ int _MLPrintLog (int priority, const char* tag, const char* fmt, ...)
         this_length = min(length-ii, PACKET_LENGTH-5);
         memset(out+3, 0, 18);
         memcpy(out+3, buf+ii, this_length);
-        printf("%s", out);
+        printf("%s\r\n", out);
     }
     va_end(args);
 

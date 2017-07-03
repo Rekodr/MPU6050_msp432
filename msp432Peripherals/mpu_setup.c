@@ -185,27 +185,27 @@ static void tap_cb(unsigned char direction, unsigned char count)
 {
     switch (direction) {
     case TAP_X_UP:
-        MPL_LOGI("Tap X+ ");
+        MPL_LOGI("Tap X+ \n\r");
         break;
     case TAP_X_DOWN:
-        MPL_LOGI("Tap X- ");
+        MPL_LOGI("Tap X- \n\r");
         break;
     case TAP_Y_UP:
-        MPL_LOGI("Tap Y+ ");
+        MPL_LOGI("Tap Y+ \n\r");
         break;
     case TAP_Y_DOWN:
-        MPL_LOGI("Tap Y- ");
+        MPL_LOGI("Tap Y- \n\r");
         break;
     case TAP_Z_UP:
-        MPL_LOGI("Tap Z+ ");
+        MPL_LOGI("Tap Z+ \n\r");
         break;
     case TAP_Z_DOWN:
-        MPL_LOGI("Tap Z- ");
+        MPL_LOGI("Tap Z- \n\r");
         break;
     default:
         return;
     }
-    MPL_LOGI("x%d\n", count);
+    MPL_LOGI("x%d\n\r", count);
     return;
 }
 
@@ -213,16 +213,20 @@ static void android_orient_cb(unsigned char orientation)
 {
     switch (orientation) {
     case ANDROID_ORIENT_PORTRAIT:
-        MPL_LOGI("Portrait\n");
+        MPL_LOGI("Portrait\n\r");
+        hal->orient = Portrait;
         break;
     case ANDROID_ORIENT_LANDSCAPE:
-        MPL_LOGI("Landscape\n");
+        MPL_LOGI("Landscape\n\r");
+        hal->orient = Landscape;
         break;
     case ANDROID_ORIENT_REVERSE_PORTRAIT:
-        MPL_LOGI("Reverse Portrait\n");
+        MPL_LOGI("Reverse Portrait\n\r");
+        hal->orient = Reverse_Portrait;
         break;
     case ANDROID_ORIENT_REVERSE_LANDSCAPE:
-        MPL_LOGI("Reverse Landscape\n");
+        MPL_LOGI("Reverse Landscape\n\r");
+        hal->orient = Reverse_Landscape;
         break;
     default:
         return;
@@ -473,6 +477,9 @@ int mpu_setup(hal_s* param)
         dmp_enable_feature(hal->dmp_features);
         dmp_set_fifo_rate(DEFAULT_MPU_HZ);
         inv_set_quat_sample_rate(1000000L / DEFAULT_MPU_HZ);
+
+        dmp_set_interrupt_mode(DMP_INT_GESTURE);
+      //  set_int_enable();
 
         /*turn on the dmp*/
         mpu_set_dmp_state(1);

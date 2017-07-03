@@ -38,6 +38,8 @@ struct rx_s {
     unsigned char cmd;
 };
 
+typedef enum {Portrait, Landscape, Reverse_Portrait, Reverse_Landscape } orientation ;
+
 struct hal_s {
     unsigned char lp_accel_mode;
     unsigned char sensors;
@@ -51,8 +53,11 @@ struct hal_s {
     unsigned long next_compass_ms;
     unsigned int report;
     unsigned short dmp_features;
+    orientation orient;
     struct rx_s rx;
 };
+
+
 typedef struct hal_s  hal_s;
 int mpu_setup(hal_s* param);
 static void msp432_reset(void);
