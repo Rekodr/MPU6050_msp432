@@ -118,15 +118,23 @@ int main(void){
         }
 
         if (new_data) {
-            if(inv_execute_on_data()) {
-                MPL_LOGE("ERROR execute on data\n");
-            }
-            /* This function reads bias-compensated sensor data and sensor
-             * fusion outputs from the MPL. The outputs are formatted as seen
-             * in eMPL_outputs.c. This function only needs to be called at the
-             * rate requested by the host.
-             */
-            read_from_mpl();
+                switch (hal.orient){
+                case Portrait:
+                    // do something here
+                    break;
+                case Landscape:
+                    // do something here
+                    break;
+                case Reverse_Portrait:
+                    // do something here
+                    break;
+                case Reverse_Landscape:
+                    // do something here
+                    break:
+                default:
+                    break;
+
+                }
         }
     }
 
