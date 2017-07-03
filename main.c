@@ -26,6 +26,7 @@ static volatile uint32_t mclk;
 
 
 
+
 int main(void){
 
 
@@ -96,10 +97,10 @@ int main(void){
             /* Enable motion interrupt. */
             mpu_lp_motion_interrupt(500, 1, 5);
             /* Notify the MPL that contiguity was broken. */
-            inv_accel_was_turned_off();
-            inv_gyro_was_turned_off();
-            inv_compass_was_turned_off();
-            inv_quaternion_sensor_was_turned_off();
+            //inv_accel_was_turned_off();
+            //inv_gyro_was_turned_off();
+            //inv_compass_was_turned_off();
+            //inv_quaternion_sensor_was_turned_off();
             /* Wait for the MPU interrupt. */
             while (!hal.new_gyro);
               MAP_PCM_gotoLPM0InterruptSafe();
@@ -125,40 +126,48 @@ int main(void){
                 hal.new_gyro = 0;
             if (sensors & INV_XYZ_GYRO) {
                 /* Push the new data to the MPL. */
+
                 inv_build_gyro(gyro, sensor_timestamp);
+
+               printf("gyro: %7.4f %7.4f %7.4f\n\r",
+                           gyro[0]/65536.f,
+                           gyro[1]/65536.f,
+                           gyro[2]/65536.f);
+
+
                 new_data = 1;
-                if (new_temp) {
-                    new_temp = 0;
-                    /* Temperature only used for gyro temp comp. */
-                    mpu_get_temperature(&temperature, &sensor_timestamp);
-                    inv_build_temp(temperature, sensor_timestamp);
-                }
+//                if (new_temp) {
+//                    new_temp = 0;
+//                    /* Temperature only used for gyro temp comp. */
+//                    mpu_get_temperature(&temperature, &sensor_timestamp);
+//                    inv_build_temp(temperature, sensor_timestamp);
+//                }
             }
             if (sensors & INV_XYZ_ACCEL) {
-                accel[0] = (long)accel_short[0];
-                accel[1] = (long)accel_short[1];
-                accel[2] = (long)accel_short[2];
-                inv_build_accel(accel, 0, sensor_timestamp);
-                new_data = 1;
+//                accel[0] = (long)accel_short[0];
+//                accel[1] = (long)accel_short[1];
+//                accel[2] = (long)accel_short[2];
+//                inv_build_accel(accel, 0, sensor_timestamp);
+//                new_data = 1;
             }
             if (sensors & INV_WXYZ_QUAT) {
-                inv_build_quat(quat, 0, sensor_timestamp);
+                //inv_build_quat(quat, 0, sensor_timestamp);
                 new_data = 1;
             }
         }
 
-        if (new_data) {
-            if(inv_execute_on_data()) {
-                MPL_LOGE("ERROR execute on data\n");
-            }
-
-            /* This function reads bias-compensated sensor data and sensor
-             * fusion outputs from the MPL. The outputs are formatted as seen
-             * in eMPL_outputs.c. This function only needs to be called at the
-             * rate requested by the host.
-             */
-            read_from_mpl();
-        }
+//        if (new_data) {
+//            if(inv_execute_on_data()) {
+//                MPL_LOGE("ERROR execute on data\n");
+//            }
+//
+//            /* This function reads bias-compensated sensor data and sensor
+//             * fusion outputs from the MPL. The outputs are formatted as seen
+//             * in eMPL_outputs.c. This function only needs to be called at the
+//             * rate requested by the host.
+//             */
+//            read_from_mpl();
+//        }
     }
 
 }
