@@ -41,6 +41,7 @@ main.obj: C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/timer32
 main.obj: C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/timer_a.h
 main.obj: C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/uart.h
 main.obj: C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/wdt_a.h
+main.obj: D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/ESP/esp.h
 main.obj: D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/msp432_Clock.h
 main.obj: D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/msp432_I2C.h
 main.obj: D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/msp432_Interrupt.h
@@ -126,6 +127,7 @@ C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/timer32.h:
 C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/timer_a.h: 
 C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/uart.h: 
 C:/ti/msp/MSP432Ware_3_50_00_02/driverlib/driverlib/MSP432P4xx/wdt_a.h: 
+D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/ESP/esp.h: 
 D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/msp432_Clock.h: 
 D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/msp432_I2C.h: 
 D:/EGR424workspace/MPU6050_msp432/msp432Peripherals/msp432_Interrupt.h: 

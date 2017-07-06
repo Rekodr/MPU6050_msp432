@@ -37,6 +37,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.DIAG_WRAP.241097448" name="Wrap diagnostic messages (--diag_wrap)" superClass="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.DIAG_WRAP" useByScannerDiscovery="false" value="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.DIAG_WRAP.off" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.INCLUDE_PATH.1124902615" name="Add dir to #include search path (--include_path, -I)" superClass="com.ti.ccstudio.buildDefinitions.MSP432_16.9.compilerID.INCLUDE_PATH" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_ROOT}\msp432Peripherals&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${PROJECT_ROOT}\msp432Peripherals\ESP&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_ROOT}\msp432Peripherals\mpuUart&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_ROOT}\eMPL-hal&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_ROOT}&quot;"/>

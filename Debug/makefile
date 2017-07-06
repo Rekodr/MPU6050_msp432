@@ -25,6 +25,7 @@ ORDERED_OBJS += \
 "./mllite/results_holder.obj" \
 "./mllite/start_manager.obj" \
 "./mllite/storage_manager.obj" \
+"./msp432Peripherals/ESP/esp.obj" \
 "./msp432Peripherals/mpuUart/log_msp432.obj" \
 "./msp432Peripherals/mpuUart/mpu_Uart.obj" \
 "./msp432Peripherals/mpu_setup.obj" \
@@ -48,6 +49,7 @@ RMDIR := RMDIR /S/Q
 -include eMPL-hal/subdir_vars.mk
 -include mllite/subdir_vars.mk
 -include mpl/subdir_vars.mk
+-include msp432Peripherals/ESP/subdir_vars.mk
 -include msp432Peripherals/mpuUart/subdir_vars.mk
 -include msp432Peripherals/subdir_vars.mk
 -include subdir_rules.mk
@@ -55,6 +57,7 @@ RMDIR := RMDIR /S/Q
 -include eMPL-hal/subdir_rules.mk
 -include mllite/subdir_rules.mk
 -include mpl/subdir_rules.mk
+-include msp432Peripherals/ESP/subdir_rules.mk
 -include msp432Peripherals/mpuUart/subdir_rules.mk
 -include msp432Peripherals/subdir_rules.mk
 -include objects.mk
@@ -188,8 +191,8 @@ MPU6050_msp432.bin: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "drivers\eMPL\inv_mpu.obj" "drivers\eMPL\inv_mpu_dmp_motion_driver.obj" "eMPL-hal\eMPL_outputs.obj" "mllite\data_builder.obj" "mllite\hal_outputs.obj" "mllite\message_layer.obj" "mllite\ml_math_func.obj" "mllite\mlmath.obj" "mllite\mpl.obj" "mllite\results_holder.obj" "mllite\start_manager.obj" "mllite\storage_manager.obj" "msp432Peripherals\mpuUart\log_msp432.obj" "msp432Peripherals\mpuUart\mpu_Uart.obj" "msp432Peripherals\mpu_setup.obj" "msp432Peripherals\msp432_Clock.obj" "msp432Peripherals\msp432_I2C.obj" "msp432Peripherals\msp432_Interrupt.obj" 
-	-$(RM) "main.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "drivers\eMPL\inv_mpu.d" "drivers\eMPL\inv_mpu_dmp_motion_driver.d" "eMPL-hal\eMPL_outputs.d" "mllite\data_builder.d" "mllite\hal_outputs.d" "mllite\message_layer.d" "mllite\ml_math_func.d" "mllite\mlmath.d" "mllite\mpl.d" "mllite\results_holder.d" "mllite\start_manager.d" "mllite\storage_manager.d" "msp432Peripherals\mpuUart\log_msp432.d" "msp432Peripherals\mpuUart\mpu_Uart.d" "msp432Peripherals\mpu_setup.d" "msp432Peripherals\msp432_Clock.d" "msp432Peripherals\msp432_I2C.d" "msp432Peripherals\msp432_Interrupt.d" 
+	-$(RM) "main.obj" "startup_msp432p401r_ccs.obj" "system_msp432p401r.obj" "drivers\eMPL\inv_mpu.obj" "drivers\eMPL\inv_mpu_dmp_motion_driver.obj" "eMPL-hal\eMPL_outputs.obj" "mllite\data_builder.obj" "mllite\hal_outputs.obj" "mllite\message_layer.obj" "mllite\ml_math_func.obj" "mllite\mlmath.obj" "mllite\mpl.obj" "mllite\results_holder.obj" "mllite\start_manager.obj" "mllite\storage_manager.obj" "msp432Peripherals\ESP\esp.obj" "msp432Peripherals\mpuUart\log_msp432.obj" "msp432Peripherals\mpuUart\mpu_Uart.obj" "msp432Peripherals\mpu_setup.obj" "msp432Peripherals\msp432_Clock.obj" "msp432Peripherals\msp432_I2C.obj" "msp432Peripherals\msp432_Interrupt.obj" 
+	-$(RM) "main.d" "startup_msp432p401r_ccs.d" "system_msp432p401r.d" "drivers\eMPL\inv_mpu.d" "drivers\eMPL\inv_mpu_dmp_motion_driver.d" "eMPL-hal\eMPL_outputs.d" "mllite\data_builder.d" "mllite\hal_outputs.d" "mllite\message_layer.d" "mllite\ml_math_func.d" "mllite\mlmath.d" "mllite\mpl.d" "mllite\results_holder.d" "mllite\start_manager.d" "mllite\storage_manager.d" "msp432Peripherals\ESP\esp.d" "msp432Peripherals\mpuUart\log_msp432.d" "msp432Peripherals\mpuUart\mpu_Uart.d" "msp432Peripherals\mpu_setup.d" "msp432Peripherals\msp432_Clock.d" "msp432Peripherals\msp432_I2C.d" "msp432Peripherals\msp432_Interrupt.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

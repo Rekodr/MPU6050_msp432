@@ -116,6 +116,7 @@ drivers/eMPL \
 eMPL-hal \
 mllite \
 mpl \
+msp432Peripherals/ESP \
 msp432Peripherals/mpuUart \
 msp432Peripherals \
 
