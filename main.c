@@ -33,15 +33,14 @@ int main(void){
 
     unsigned char  new_temp = 0;
     unsigned long timestamp;
+    unsigned long sensor_timestamp;
+    int new_data = 0;
+
 
     MAP_WDT_A_holdTimer();
     MAP_PCM_setPowerMode(PCM_LDO_MODE);
     MAP_PCM_setCoreVoltageLevel(PCM_VCORE1);
     mclk = CS_getMCLK();
-
-    P2->DIR |= BIT2;
-    P2->OUT &= ~BIT2;
-
     init_mpuUART();
 
     i2c_enable();
@@ -68,9 +67,8 @@ int main(void){
 
     mpu_setup(&hal);
     while(1){
-        unsigned long sensor_timestamp;
-        int new_data = 0;
 
+        new_data = 0;
         get_timestamp(&timestamp);
 
         /* Temperature data doesn't need to be read with every gyro sample.
@@ -130,7 +128,7 @@ int main(void){
                     break;
                 case Reverse_Landscape:
                     // do something here
-                    break:
+                    break;
                 default:
                     break;
 
