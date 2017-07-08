@@ -56,6 +56,7 @@ extern void systic_handler(void);
 extern void I2C_IRQHandler(void);
 extern void PORT4_IRQHandler(void);
 extern void timer32Interrup_handler(void);
+extern void receiveHandler(void);
 /* External declarations for the interrupt handlers used by the application. */
 
 /* To be added by user */
@@ -103,7 +104,7 @@ void (* const interruptVectors[])(void) =
     defaultISR,                             /* TA3_N ISR                 */
     defaultISR,                             /* EUSCIA0 ISR               */
     defaultISR,                             /* EUSCIA1 ISR               */
-    defaultISR,                             /* EUSCIA2 ISR               */
+    receiveHandler,                         /* EUSCIA2 ISR               */
     defaultISR,                             /* EUSCIA3 ISR               */
     defaultISR,                             /* EUSCIB0 ISR               */
     I2C_IRQHandler,                         /* EUSCIB1 ISR               */

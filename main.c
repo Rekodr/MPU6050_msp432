@@ -18,15 +18,36 @@
 #include "invensense_adv.h"
 
 #include "mpu_Uart.h"
+#include "esp.h"
 
 static volatile uint32_t mclk;
 
 
+int main(void){
+
+   //
+    init_ESP8266_UART();
+    MAP_Interrupt_enableMaster();
+    //esp_rst();
+
+
+    esp_setMode(Station_mode);
+    delay_ms(1000);
+    ESP_OutString("AT+CIPMUX=1\r\n");
+    esp_connectWiFi("Blb", "Madara297");
+    delay_ms(1000);
+  // esp_cipStart(TCP, "192.168.88.35", "80");
+  //  ESP_OutString("AT+PING=\"www.google.com\"\r\n");
+   ESP_OutString("AT+CIPSTART=4,\"TCP\",\"184.106.153.149\",80\r\n");
+    while(1){
+
+    }
+    return 0;
+}
 
 
 
-
-
+/*
 int main(void){
 
 
@@ -49,7 +70,7 @@ int main(void){
 
     hal_s hal = {};
 
-    /* Initialize HAL state variables. */
+     Initialize HAL state variables.
         hal.sensors = ACCEL_ON | GYRO_ON;
         hal.dmp_on = 1;
         hal.report = 0;
@@ -58,7 +79,7 @@ int main(void){
         hal.next_compass_ms = 0;
         hal.next_temp_ms = 0;
 
-    /*activate feature to activate*/
+    activate feature to activate
     hal.dmp_features =  DMP_FEATURE_ANDROID_ORIENT | DMP_FEATURE_GYRO_CAL;
                         //DMP_FEATURE_6X_LP_QUAT
                         //DMP_FEATURE_TAP
@@ -71,21 +92,21 @@ int main(void){
         new_data = 0;
         get_timestamp(&timestamp);
 
-        /* Temperature data doesn't need to be read with every gyro sample.
+         Temperature data doesn't need to be read with every gyro sample.
          * Let's make them timer-based like the compass reads.
-         */
+
         if (timestamp > hal.next_temp_ms) {
             hal.next_temp_ms = timestamp + TEMP_READ_MS;
             new_temp = 1;
         }
 
         if (hal.motion_int_mode) {
-            /* Enable motion interrupt. */
+             Enable motion interrupt.
             mpu_lp_motion_interrupt(500, 3000, 5);
-            /* Wait for the MPU interrupt. */
+             Wait for the MPU interrupt.
             while (!hal.new_gyro);
               MAP_PCM_gotoLPM0InterruptSafe();
-            /* Restore the previous sensor configuration. */
+             Restore the previous sensor configuration.
             mpu_lp_motion_interrupt(0, 0, 0);
             hal.motion_int_mode = 0;
         }
@@ -103,7 +124,7 @@ int main(void){
             if (!more)
                 hal.new_gyro = 0;
             if (sensors & INV_XYZ_GYRO) {
-                /* Push the new data to the MPL. */
+                 Push the new data to the MPL.
                 inv_build_gyro(gyro, sensor_timestamp);
                 new_data = 1;
             }
@@ -136,7 +157,7 @@ int main(void){
         }
     }
 
-}
+}*/
 
 
 
