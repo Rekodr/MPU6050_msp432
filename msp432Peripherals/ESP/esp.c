@@ -13,7 +13,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+
 
 
 #define time_delay 250
@@ -135,11 +137,10 @@ int esp_setMode(espMode mode)
 }
 
 
-int esp_cipStart(connectionType type, char* IP, char* Port){
+int esp_StartConnection(connectionType type, char* IP, char* Port){
 
     int i;
-    //char* tmp = (char*)malloc(sizeof(char) * 100);
-    char tmp[100];
+    char* tmp = (char*)malloc(sizeof(char) * 100);
     for(i=0; i < 100; i++)
         tmp[i] = '\0';
 
@@ -151,7 +152,7 @@ int esp_cipStart(connectionType type, char* IP, char* Port){
         strcpy(tmp + strlen(cmd), "\"TCP\",\"");
         break;
     case UDP:
-        strcpy(tmp + strlen(cmd), "\"UDP\",\"");
+        strcpy(tmp + strlen(cmd), "\"UDP\",\""); //@todo: need to work on the UDP stuff. no completed
         break;
     case SSL:
         strcpy(tmp + strlen(cmd), "\"UDP\",\"");
@@ -168,72 +169,89 @@ int esp_cipStart(connectionType type, char* IP, char* Port){
     MAP_PCM_gotoLPM0InterruptSafe();
     delay_ms(1000);
 
-    if(search("OK") == 0 && search("ALREADY CONNECT") == 0)
+    free(tmp);
+    if(search("CONNECT") == 0 && search("ALREADY CONNECT") == 0)
         return 1;
     return 0;
 }
 
 
 
-void ESP_SendString( char *dataOut)
+int esp_sendString( char *dataOut)
 {
 
-    int i,len = 0;
+    int len;
+    if(dataOut == NULL)
+        return -1;
+
+    clearBuffer();
 
     delay_ms(time_delay);
-
-    len  = strlen(dataOut) +1;
-
+    len = strlen(dataOut) + 1;
     ESP_OutString("AT+CIPSEND=");
-    if (len>9)
+
+    if (len > 9)
     {
-        ESP_OutChar((len/10)+48);
-        ESP_OutChar((len%10)+48);
+        ESP_OutChar((len / 10) + 48);
+        ESP_OutChar((len % 10) + 48);
     }
     else
-        ESP_OutChar(len+48);
+        ESP_OutChar(len + 48);
 
     ESP_OutString("\r\n");
-    delay_ms(1);
+    MAP_PCM_gotoLPM0InterruptSafe();
+    delay_ms(100);
 
+    if(search("OK") == 0)
+        return 1;
 
-   // ESP_OutString("Helo 192.168.43.144");
-    len = strlen(dataOut)-1;
-
-     for(i=0; i<len ; i++)
-     {
-       while((EUSCI_A2->IFG & 0x02) == 0);
-       EUSCI_A2->TXBUF = *dataOut++;
-     }
-
+    clearBuffer();
+    ESP_OutString(dataOut);
     ESP_OutString("\r\n");
-    delay_ms(time_delay);
+    MAP_PCM_gotoLPM0InterruptSafe();
+    delay_ms(300);
 
+    if(search("SEND OK") == 0)
+        return -1;
+
+    return 0;
 }
 
 
 
-void SendEmail(char* src, char* dst, char* msg)
+int sendEmail(char* src, char* dst, char* msg)
 {
+    char SRC[100] = "";
+    char DST[100] = "";
+    char s[100] = "";
+    char d[100] = "";
 
-    ESP_OutString("AT+CIPSTART=\"TCP\",\"152.163.0.69\",587\r\n");
+    sprintf(SRC,"MAIL FROM:<%s>.", src);
+    sprintf(DST,"RCPT TO:<%s>", dst);
+    sprintf(s, "From: %s <%s>.", src, src);
+    sprintf(d, "To: %s <%s>.", dst, dst);
+
+    esp_StartConnection(TCP, "152.163.0.69", "587");
     delay_ms(250);
 
-    ESP_SendString("Helo 192.168.43.144.");
-    ESP_SendString("AUTH LOGIN.");
-    ESP_SendString("anRhdGNoaW5AYW9sLmNvbQ==.");
-    ESP_SendString("aGVsbG9nb29kYnllMQ==.");
-    ESP_SendString("MAIL FROM:<jtatchin@aol.com>.");
-    ESP_SendString("RCPT TO:<jordantatchin@gmail.com>.");
-    ESP_SendString("DATA.");
-    ESP_SendString("From: jtatchin@aol.com <jtatchin@aol.com>.");
-    ESP_SendString("To: jordantatchin@gmail.com <jordantatchin@gmail.com>.");
-    ESP_SendString("Subject: Orientation Changed.");
-
+    esp_sendString("Helo 192.168.43.144.");
+    esp_sendString("AUTH LOGIN.");
+    esp_sendString("anRhdGNoaW5AYW9sLmNvbQ==.");
+    esp_sendString("aGVsbG9nb29kYnllMQ==.");
+    //esp_sendString("MAIL FROM:<jtatchin@aol.com>.");
+    esp_sendString(SRC);
+    //esp_sendString("RCPT TO:<jordantatchin@gmail.com>.");
+    esp_sendString(DST);
+    esp_sendString("DATA.");
+    //esp_sendString("From: jtatchin@aol.com <jtatchin@aol.com>.");
+    esp_sendString(s);
+    //esp_sendString("To: jordantatchin@gmail.com <jordantatchin@gmail.com>.");
+    esp_sendString(d);
+    esp_sendString("Subject: Orientation Changed.");
     ESP_OutString("AT+CIPSEND=3\r\n");
     delay_ms(1000);
     ESP_OutString(".\r\n");
-
+    return 0;
 }
 
 
@@ -248,7 +266,6 @@ void init_ESP8266_UART()
 {
     // Selecting P3.2 and P3.3 in UART mode.
     MAP_GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN2 | GPIO_PIN3, GPIO_PRIMARY_MODULE_FUNCTION);
-
     // Configuring UART Module
     MAP_UART_initModule(EUSCI_A2_BASE, &espConfig);
     // Enable UART module
