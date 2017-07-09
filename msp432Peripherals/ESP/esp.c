@@ -200,7 +200,7 @@ int esp_sendString( char *dataOut)
 
     ESP_OutString("\r\n");
     MAP_PCM_gotoLPM0InterruptSafe();
-    delay_ms(100);
+    delay_ms(50);
 
     if(search("OK") == 0)
         return 1;
@@ -209,7 +209,7 @@ int esp_sendString( char *dataOut)
     ESP_OutString(dataOut);
     ESP_OutString("\r\n");
     MAP_PCM_gotoLPM0InterruptSafe();
-    delay_ms(300);
+    delay_ms(50);
 
     if(search("SEND OK") == 0)
         return -1;
@@ -232,35 +232,39 @@ int sendEmail(char* src, char* dst, char* msg)
     sprintf(d, "To: %s <%s>.", dst, dst);
 
     esp_StartConnection(TCP, "152.163.0.69", "587");
-    delay_ms(250);
+    delay_ms(200);
 
     esp_sendString("Helo 192.168.43.144.");
+    delay_ms(100);
     esp_sendString("AUTH LOGIN.");
+    delay_ms(100);
     esp_sendString("anRhdGNoaW5AYW9sLmNvbQ==.");
+    delay_ms(100);
     esp_sendString("aGVsbG9nb29kYnllMQ==.");
+    delay_ms(100);
     //esp_sendString("MAIL FROM:<jtatchin@aol.com>.");
     esp_sendString(SRC);
+    delay_ms(100);
     //esp_sendString("RCPT TO:<jordantatchin@gmail.com>.");
     esp_sendString(DST);
+    delay_ms(100);
     esp_sendString("DATA.");
+    delay_ms(100);
     //esp_sendString("From: jtatchin@aol.com <jtatchin@aol.com>.");
     esp_sendString(s);
+    delay_ms(100);
     //esp_sendString("To: jordantatchin@gmail.com <jordantatchin@gmail.com>.");
     esp_sendString(d);
+    delay_ms(100);
     esp_sendString("Subject: Orientation Changed.");
+    delay_ms(100);
+    esp_sendString("The new position is X");
     ESP_OutString("AT+CIPSEND=3\r\n");
-    delay_ms(1000);
+    delay_ms(100);
+    delay_ms(1);
     ESP_OutString(".\r\n");
     return 0;
 }
-
-
-
-
-
-
-
-
 
 void init_ESP8266_UART()
 {

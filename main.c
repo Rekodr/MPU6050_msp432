@@ -65,8 +65,9 @@ int main(void){
     init_ESP8266_UART();
     i2c_enable();
     MAP_Interrupt_enableMaster();
+    setup_timer();
     esp_setMode(Station_mode);
-    esp_connectWiFi("Blb", "Madara297");
+    esp_connectWiFi("No_life", "welcome123");
     setup_timer();
 
     hal_s hal = {};
@@ -134,21 +135,22 @@ int main(void){
             }
             if (sensors & INV_WXYZ_QUAT) {
                 new_data = 1;
-            }
+            }else
+                new_data = 1;
         }
         if (new_data) {
                 switch (hal.orient){
                 case Portrait:
-                    sendEmail("jtatchin@aol.com", "jordantatchin@gmail.com", "Portrait");
+                    sendEmail("jtatchin@aol.com", "rekodr@mail.gvsu.edu", "Portrait");
                     break;
                 case Landscape:
-                    sendEmail("jtatchin@aol.com", "jordantatchin@gmail.com", "Landscape");
+                    sendEmail("jtatchin@aol.com", "rekodr@mail.gvsu.edu", "Landscape");
                     break;
                 case Reverse_Portrait:
-                    sendEmail("jtatchin@aol.com", "jordantatchin@gmail.com", "Reverse_Portrait");
+                    sendEmail("jtatchin@aol.com", "rekodr@mail.gvsu.edu", "Reverse_Portrait");
                     break;
                 case Reverse_Landscape:
-                    sendEmail("jtatchin@aol.com", "jordantatchin@gmail.com", "Reverse_Landscape");
+                    sendEmail("jtatchin@aol.com", "rekodr@mail.gvsu.edu", "Reverse_Landscape");
                     break;
                 default:
                     break;
