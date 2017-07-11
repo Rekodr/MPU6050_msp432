@@ -41,16 +41,13 @@ struct platform_data_s {
     signed char orientation[9];
 };
 
-/* The sensors can be mounted onto the board in any orientation. The mounting
- * matrix seen below tells the MPL how to rotate the raw data from the
- * driver(s).
- * TODO: The following matrices refer to the configuration on internal test
+/**
  * boards at Invensense. If needed, please modify the matrices to match the
  * chip-to-body matrix for your particular set up.
  */
 static struct platform_data_s gyro_pdata = {
-    .orientation = { 1, 0, 0,
-                     0, 1, 0,
+    .orientation = { 0, 1, 0,
+                     -1, 0, 0,
                      0, 0, 1}
 };
 

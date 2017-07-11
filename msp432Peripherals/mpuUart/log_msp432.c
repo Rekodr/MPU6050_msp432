@@ -8,15 +8,10 @@
  *******************************************************************************/
 
 /**
- *  @defgroup MSP430_System_Layer MSP430 System Layer
- *  @brief  MSP430 System Layer APIs.
- *          To interface with any platform, eMPL needs access to various
- *          system layer functions.
- *
- *  @{
  *      @file   log_msp430.c
- *      @brief  Logging facility for the TI MSP430.
  */
+/*        @modified by Recodeo Rekod*/
+
 
 #include <stdio.h>
 #include <stdint.h>
@@ -40,7 +35,7 @@
 
 /**
  *  @brief      Prints a variable argument log message.
- *  USB output will be formatted as follows:\n
+ *  UART output will be formatted as follows:\n
  *  packet[0]       = $\n
  *  packet[1]       = packet type (1: debug, 2: quat, 3: data)\n
  *  packet[2]       = \n for debug packets: log priority\n

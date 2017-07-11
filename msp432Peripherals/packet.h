@@ -36,7 +36,7 @@ typedef enum {
 } eMPL_packet_e;
 
 /**
- *  @brief      Send a quaternion packet via USB.
+ *  @brief      Send a quaternion packet via UART.
  *  The host is expected to use the data in this packet to graphically
  *  represent the device orientation. To send quaternion in the same manner
  *  as any other data packet, use eMPL_send_data.
@@ -45,7 +45,7 @@ typedef enum {
 void eMPL_send_quat(long *quat);
 
 /**
- *  @brief      Send a data packet via USB.
+ *  @brief      Send a data packet via UART.
  *  @param[in]  type    Contents of packet (PACKET_DATA_ACCEL, etc).
  *  @param[in]  data    Data (length dependent on contents).
  */

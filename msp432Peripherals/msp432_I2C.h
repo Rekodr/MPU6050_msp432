@@ -27,7 +27,6 @@ int i2c_disable(void);
 
 /**
  *  @brief      Write to a device register.
- *
  *  @param[in]  slave_addr  Slave address of device.
  *  @param[in]  reg_addr    Slave register to be written to.
  *  @param[in]  length      Number of bytes to write.
@@ -42,7 +41,6 @@ int i2c_write(unsigned char slave_addr,
 
 /**
  *  @brief      Read from a device.
- *
  *  @param[in]  slave_addr  Slave address of device.
  *  @param[in]  reg_addr    Slave register to be read from.
  *  @param[in]  length      Number of bytes to read.

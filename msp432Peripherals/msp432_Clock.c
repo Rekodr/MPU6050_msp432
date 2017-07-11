@@ -20,14 +20,18 @@ static Clock counter = {
 
 
 void setup_timer(void) {
-    SysTick->CTRL = 0;      /*disable SysTick during setup*/
-    SysTick->LOAD = 0xBBB;  /*max: 3003 => 1 ms*/
-    SysTick->VAL = 0;       /*any write to current clears it*/
+    /*disable SysTick during setup*/
+    SysTick->CTRL = 0;
+    /*max: 3003 => 1 ms*/
+    SysTick->LOAD = 0xBBB;
+    SysTick->VAL = 0;
+
     SysTick->CTRL |= SysTick_CTRL_CLKSOURCE_Msk /*set Systick default clock source*/
                   |  SysTick_CTRL_TICKINT_Msk;   /*enable Systick interrupt*/
 
     counter.enable_Delay = 0;
-    SysTick-> CTRL |= SysTick_CTRL_ENABLE_Msk;  /*enable SysTick*/
+    /*enable SysTick*/
+    SysTick-> CTRL |= SysTick_CTRL_ENABLE_Msk;
     MAP_Interrupt_enableMaster();
 }
 
@@ -40,13 +44,15 @@ int get_timestamp(unsigned long* time_ms){
     return 0;
 }
 
-/* ----Configurable Systick delay fromm 1 ms to .... ms----*/
+/* ----Configurable Systick delay fromm 1 ms to 5586 ms----*/
 void delay_ms(unsigned long ms){
 
     MAP_SysTick_disableModule();
+
     if(counter.enable_Delay)
         return;
 
+   /*assigning the delay */
    counter.timer_remaining_ms = ms;
    setup_timer();
    counter.enable_Delay = 1;
@@ -60,6 +66,7 @@ void systic_handler(void){
     counter.timestamp++;
     if(counter.timer_remaining_ms){
         counter.timer_remaining_ms--;
+     /*   check for the remain delay and go sleep*/
         if(counter.timer_remaining_ms == 0){
             counter.enable_Delay = 0;
             MAP_Interrupt_disableSleepOnIsrExit();

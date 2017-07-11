@@ -1,10 +1,3 @@
-/*
- * esp.c
- *
- *  Created on: 6 juil. 2017
- *      Author: Madara
- */
-
 
 #include <driverlib.h>
 #include "esp.h"
@@ -18,15 +11,22 @@
 
 
 
-#define time_delay 250
+#define aolKey_a "anRhdGNoaW5AYW9sLmNvbQ=="
+#define aolKey_b "aGVsbG9nb29kYnllMQ=="
+#define aol_ip "152.163.0.69"
+#define aol_serverPort "587"
 
+
+#define time_delay 250
+#define t_tdelay   200
+#define MSG_SIZE 80
 static char rxBuffer[800];
 unsigned int uartrxCnt = 0;
 
 
 
 
-int search(char* rsp) {
+int search(char* buffer, char* rsp) {
     int pos_search = 0;
     int pos_text = 0;
     int len_search = strlen(rsp);
@@ -34,7 +34,7 @@ int search(char* rsp) {
 
     for (pos_text = 0; pos_text < len_text - len_search;++pos_text)
     {
-        if(rxBuffer[pos_text] == rsp[pos_search])
+        if(buffer[pos_text] == rsp[pos_search])
         {
             ++pos_search;
             if(pos_search == len_search)
@@ -72,8 +72,6 @@ const eUSCI_UART_Config espConfig =
 
 
 
-
-
 void clearBuffer(){
     int i;
     uartrxCnt = 0;
@@ -95,10 +93,9 @@ int esp_connectWiFi(char* ssid, char* password){
     ESP_OutString(tmp);
     MAP_PCM_gotoLPM0InterruptSafe();
     delay_ms(5000);
-
-    if(search("WIFI GOT IP") == 0)
-        return 1;
     free(tmp);
+    if(search(rxBuffer, "WIFI GOT IP") == 0)
+        return 1;
     return 0 ;
 }
 
@@ -108,7 +105,7 @@ int esp_rst(){
     MAP_PCM_gotoLPM0InterruptSafe();
     delay_ms(2000);
 
-    if(search("ready") == 0)
+    if(search(rxBuffer, "ready") == 0)
         return 1;
     return 0;
 }
@@ -130,8 +127,8 @@ int esp_setMode(espMode mode)
     }
 
     MAP_PCM_gotoLPM0InterruptSafe();
-    delay_ms(500);
-    if(search("OK") == 0)
+    delay_ms(200);
+    if(search(rxBuffer, "OK") == 0)
             return 1;
     return 0 ;
 }
@@ -170,7 +167,7 @@ int esp_StartConnection(connectionType type, char* IP, char* Port){
     delay_ms(1000);
 
     free(tmp);
-    if(search("CONNECT") == 0 && search("ALREADY CONNECT") == 0)
+    if(search(rxBuffer,"CONNECT") == 0 && search(rxBuffer,"ALREADY CONNECT") == 0)
         return 1;
     return 0;
 }
@@ -187,7 +184,7 @@ int esp_sendString( char *dataOut)
     clearBuffer();
 
     delay_ms(time_delay);
-    len = strlen(dataOut) + 1;
+    len = strlen(dataOut)+2;
     ESP_OutString("AT+CIPSEND=");
 
     if (len > 9)
@@ -200,9 +197,9 @@ int esp_sendString( char *dataOut)
 
     ESP_OutString("\r\n");
     MAP_PCM_gotoLPM0InterruptSafe();
-    delay_ms(50);
+    delay_ms(100);
 
-    if(search("OK") == 0)
+    if(search(rxBuffer, "OK") == 0)
         return 1;
 
     clearBuffer();
@@ -211,7 +208,7 @@ int esp_sendString( char *dataOut)
     MAP_PCM_gotoLPM0InterruptSafe();
     delay_ms(50);
 
-    if(search("SEND OK") == 0)
+    if(search(rxBuffer, "SEND OK") == 0)
         return -1;
 
     return 0;
@@ -221,48 +218,43 @@ int esp_sendString( char *dataOut)
 
 int sendEmail(char* src, char* dst, char* msg)
 {
-    char SRC[100] = "";
-    char DST[100] = "";
-    char s[100] = "";
-    char d[100] = "";
+    char SRC[MSG_SIZE] = "";
+    char DST[MSG_SIZE] = "";
+    char s[MSG_SIZE] = "";
+    char d[MSG_SIZE] = "";
+    char MSG[MSG_SIZE] = "";
 
-    sprintf(SRC,"MAIL FROM:<%s>.", src);
+    sprintf(SRC,"MAIL FROM:<%s>", src);
     sprintf(DST,"RCPT TO:<%s>", dst);
-    sprintf(s, "From: %s <%s>.", src, src);
-    sprintf(d, "To: %s <%s>.", dst, dst);
-
-    esp_StartConnection(TCP, "152.163.0.69", "587");
+    sprintf(s, "From: %s <%s>", src, src);
+    sprintf(d, "To: %s <%s>", dst, dst);
+    sprintf(MSG, "New orientation: %s", msg);
+    esp_StartConnection(TCP, aol_ip, aol_serverPort);
     delay_ms(200);
 
-    esp_sendString("Helo 192.168.43.144.");
-    delay_ms(100);
-    esp_sendString("AUTH LOGIN.");
-    delay_ms(100);
-    esp_sendString("anRhdGNoaW5AYW9sLmNvbQ==.");
-    delay_ms(100);
-    esp_sendString("aGVsbG9nb29kYnllMQ==.");
-    delay_ms(100);
-    //esp_sendString("MAIL FROM:<jtatchin@aol.com>.");
+    esp_sendString("Helo 192.168.43.144");
+    delay_ms(t_tdelay);
+    esp_sendString("AUTH LOGIN");
+    delay_ms(t_tdelay);
+    esp_sendString(aolKey_a);
+    delay_ms(t_tdelay);
+    esp_sendString(aolKey_b);
+    delay_ms(t_tdelay);
     esp_sendString(SRC);
-    delay_ms(100);
-    //esp_sendString("RCPT TO:<jordantatchin@gmail.com>.");
+    delay_ms(t_tdelay);
     esp_sendString(DST);
-    delay_ms(100);
-    esp_sendString("DATA.");
-    delay_ms(100);
-    //esp_sendString("From: jtatchin@aol.com <jtatchin@aol.com>.");
+    delay_ms(t_tdelay);
+    esp_sendString("DATA");
+    delay_ms(t_tdelay);
     esp_sendString(s);
-    delay_ms(100);
-    //esp_sendString("To: jordantatchin@gmail.com <jordantatchin@gmail.com>.");
+    delay_ms(t_tdelay);
     esp_sendString(d);
-    delay_ms(100);
+    delay_ms(t_tdelay);
     esp_sendString("Subject: Orientation Changed.");
-    delay_ms(100);
-    esp_sendString("The new position is X");
-    ESP_OutString("AT+CIPSEND=3\r\n");
-    delay_ms(100);
-    delay_ms(1);
-    ESP_OutString(".\r\n");
+    delay_ms(t_tdelay);
+     esp_sendString(MSG);
+    delay_ms(t_tdelay);
+    esp_sendString(".\r\n");
     return 0;
 }
 
